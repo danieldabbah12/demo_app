@@ -1,3 +1,5 @@
+import streamlit as st
+
 st.title("האפליקציה שלי")
 
 # כותרת משנה
