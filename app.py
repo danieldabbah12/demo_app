@@ -97,7 +97,7 @@ def generate_data():
         neigh = np.random.choice(neigh_list, p=weights)
         info  = neighborhoods[neigh]
 
-        area          = int(np.random.normal(80, 30).clip(30, 220))
+        area          = int(np.clip(np.random.normal(80, 30), 30, 220))
         dist_sea      = round(np.random.uniform(*info["dist_sea_range"]), 1)
         year_built    = int(np.random.choice(
             range(1950, 2024),
