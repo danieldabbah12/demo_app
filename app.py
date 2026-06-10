@@ -7,17 +7,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 
 # ==================================================
-# הגדרות עמוד
+# PAGE CONFIG
 # ==================================================
 
 st.set_page_config(
-    page_title="נדל״ן תל אביב AI",
+    page_title="Tel Aviv Real Estate AI",
     page_icon="🏙️",
     layout="wide"
 )
 
 # ==================================================
-# עיצוב
+# DESIGN
 # ==================================================
 
 st.markdown("""
@@ -35,17 +35,11 @@ section[data-testid="stSidebar"] {
     background-color: #eaf4ff;
 }
 
-.stMetric {
-    background-color: white;
-    padding: 15px;
-    border-radius: 15px;
-    border: 1px solid #dbeafe;
-}
-
 div[data-testid="stMetric"] {
     background-color: white;
-    border-radius: 12px;
-    padding: 10px;
+    border-radius: 14px;
+    padding: 15px;
+    border: 1px solid #dbeafe;
 }
 
 .stButton>button {
@@ -55,13 +49,19 @@ div[data-testid="stMetric"] {
     border: none;
     padding: 12px 20px;
     font-size: 16px;
+    font-weight: bold;
+}
+
+.stButton>button:hover {
+    background-color: #004799;
+    color: white;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # ==================================================
-# יצירת דאטה סינתטי
+# CREATE DATA
 # ==================================================
 
 @st.cache_data
@@ -84,27 +84,42 @@ def create_data():
 
     for _ in range(300):
 
-        neighborhood = np.random.choice(list(neighborhoods.keys()))
+        neighborhood = np.random.choice(
+            list(neighborhoods.keys())
+        )
+
         factor = neighborhoods[neighborhood]
 
         size = np.random.randint(45, 180)
 
-        distance_from_sea = np.random.randint(100, 5000)
+        distance_from_sea = np.random.randint(
+            100,
+            5000
+        )
 
-        year = np.random.randint(1960, 2025)
+        year = np.random.randint(
+            1960,
+            2025
+        )
 
-        apartments_in_building = np.random.randint(4, 80)
+        apartments_in_building = np.random.randint(
+            4,
+            80
+        )
 
-        rooms = np.random.randint(2, 7)
+        rooms = np.random.randint(
+            2,
+            7
+        )
 
         balcony = np.random.choice(
             ["כן", "לא"],
             p=[0.7, 0.3]
         )
 
-        # =====================================
-        # נוסחת מחיר ריאליסטית יותר
-        # =====================================
+        # ======================================
+        # REALISTIC PRICE FORMULA
+        # ======================================
 
         price = (
             size * 25000
@@ -116,10 +131,13 @@ def create_data():
 
         price = price * factor
 
-        # רעש אקראי
-        price += np.random.normal(0, 180000)
+        # RANDOM NOISE
+        price += np.random.normal(
+            0,
+            180000
+        )
 
-        # גבולות ריאליסטיים
+        # REALISTIC LIMITS
         price = max(price, 1800000)
         price = min(price, 8500000)
 
@@ -139,7 +157,7 @@ def create_data():
 df = create_data()
 
 # ==================================================
-# הכנת מודל
+# MODEL
 # ==================================================
 
 model_df = df.copy()
@@ -154,7 +172,11 @@ model_df = pd.get_dummies(
     columns=["שכונה"]
 )
 
-X = model_df.drop("מחיר הדירה", axis=1)
+X = model_df.drop(
+    "מחיר הדירה",
+    axis=1
+)
+
 y = model_df["מחיר הדירה"]
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -169,107 +191,117 @@ model = RandomForestRegressor(
     random_state=42
 )
 
-model.fit(X_train, y_train)
+model.fit(
+    X_train,
+    y_train
+)
 
 predictions = model.predict(X_test)
 
-mae = mean_absolute_error(y_test, predictions)
-r2 = r2_score(y_test, predictions)
+mae = mean_absolute_error(
+    y_test,
+    predictions
+)
+
+r2 = r2_score(
+    y_test,
+    predictions
+)
 
 # ==================================================
 # SIDEBAR
 # ==================================================
 
-st.sidebar.title("🏙️ תל אביב נדל״ן AI")
+st.sidebar.title("🏙️ Tel Aviv Real Estate AI")
 
 page = st.sidebar.radio(
-    "ניווט",
+    "Navigation",
     [
-        "דף הבית",
-        "אנליטיקות",
-        "חיזוי מחיר",
-        "איך המודל עובד?"
+        "Home",
+        "Analytics",
+        "Price Prediction",
+        "How The Model Works"
     ]
 )
 
-st.sidebar.info(
-    "האפליקציה נבנתה לצורכי לימוד והדגמת Machine Learning."
-)
-
 # ==================================================
-# דף הבית
+# HOME
 # ==================================================
 
-if page == "דף הבית":
+if page == "Home":
 
-    st.title("🏙️ חיזוי מחירי דירות בתל אביב")
+    st.title("🏙️ Tel Aviv Real Estate AI")
 
     st.markdown("""
-    ### ברוכים הבאים למערכת נדל״ן AI
+    ## Smart Real Estate Price Prediction Platform
 
-    האפליקציה מדגימה כיצד ניתן:
+    This system demonstrates how Machine Learning
+    can analyze apartment features and predict
+    real estate prices in Tel Aviv.
 
-    - ליצור דאטה סינתטי
-    - לנתח נתונים
-    - להציג גרפים
-    - לאמן מודל Machine Learning
-    - לחזות מחירי דירות בזמן אמת
-
-    המערכת מבוססת על מודל Random Forest.
+    The platform includes:
+    - Interactive analytics
+    - Visual insights
+    - Real-time predictions
+    - Feature importance analysis
+    - Machine Learning metrics
     """)
 
     col1, col2, col3 = st.columns(3)
 
     col1.metric(
-        "מספר דירות",
+        "Apartments",
         len(df)
     )
 
     col2.metric(
-        "מחיר ממוצע",
+        "Average Price",
         f"{int(df['מחיר הדירה'].mean()):,} ₪"
     )
 
     col3.metric(
-        "דיוק המודל (R²)",
+        "Model Accuracy",
         f"{r2:.2f}"
     )
 
     st.divider()
 
-    st.subheader("📌 תובנות מרכזיות")
+    st.subheader("📌 Key Insights")
 
     st.success(
-        "דירות קרובות לים יקרות משמעותית."
+        "Apartments closer to the sea are significantly more expensive."
     )
 
     st.info(
-        "שכונות הצפון הישן ורמת אביב הן היקרות ביותר."
+        "North Tel Aviv neighborhoods dominate the luxury market."
     )
 
     st.warning(
-        "מרפסת מעלה את מחיר הדירה באופן משמעותי."
+        "Balconies have a strong impact on apartment prices."
     )
 
     st.divider()
 
-    st.subheader("🏘️ דוגמה מהדאטה")
+    st.subheader("🏘️ Sample Data")
 
-    st.dataframe(df.sample(10))
+    st.dataframe(
+        df.sample(10),
+        use_container_width=True
+    )
 
 # ==================================================
-# אנליטיקות
+# ANALYTICS
 # ==================================================
 
-elif page == "אנליטיקות":
+elif page == "Analytics":
 
-    st.title("📊 אנליטיקות וגרפים")
+    st.title("📊 Real Estate Analytics")
 
     tab1, tab2, tab3, tab4 = st.tabs([
-        "מחירים",
-        "שכונות",
-        "פיצ'רים",
-        "התפלגויות"
+        "Prices",
+        "Neighborhoods",
+        "Model Insights",
+        "Distributions"
     ])
 
     # ==================================================
@@ -278,7 +310,7 @@ elif page == "אנליטיקות":
 
     with tab1:
 
-        st.subheader("מחיר מול שטח דירה")
+        st.subheader("Apartment Size vs Price")
 
         st.scatter_chart(
             df,
@@ -286,7 +318,7 @@ elif page == "אנליטיקות":
             y="מחיר הדירה"
         )
 
-        st.subheader("מחיר לפי מספר חדרים")
+        st.subheader("Average Price by Number of Rooms")
 
         room_prices = (
             df.groupby("מספר חדרים")["מחיר הדירה"]
@@ -301,7 +333,7 @@ elif page == "אנליטיקות":
 
     with tab2:
 
-        st.subheader("מחיר ממוצע לפי שכונה")
+        st.subheader("Average Price by Neighborhood")
 
         avg_prices = (
             df.groupby("שכונה")["מחיר הדירה"]
@@ -311,7 +343,7 @@ elif page == "אנליטיקות":
 
         st.bar_chart(avg_prices)
 
-        st.subheader("כמה דירות יש בכל שכונה")
+        st.subheader("Number of Apartments by Neighborhood")
 
         neighborhood_counts = (
             df["שכונה"]
@@ -329,20 +361,37 @@ elif page == "אנליטיקות":
         st.subheader("Feature Importance")
 
         importance_df = pd.DataFrame({
-            "פיצ'ר": X.columns,
-            "חשיבות": model.feature_importances_
+            "Feature": X.columns,
+            "Importance": model.feature_importances_
         })
 
         importance_df = importance_df.sort_values(
-            by="חשיבות",
+            by="Importance",
             ascending=False
         )
 
         st.bar_chart(
-            importance_df.set_index("פיצ'ר")
+            importance_df.set_index("Feature")
         )
 
-        st.dataframe(importance_df)
+        st.dataframe(
+            importance_df,
+            use_container_width=True
+        )
+
+        st.subheader("Model Performance")
+
+        col1, col2 = st.columns(2)
+
+        col1.metric(
+            "MAE",
+            f"{int(mae):,} ₪"
+        )
+
+        col2.metric(
+            "R² Score",
+            f"{r2:.2f}"
+        )
 
     # ==================================================
     # TAB 4
@@ -350,37 +399,35 @@ elif page == "אנליטיקות":
 
     with tab4:
 
-        st.subheader("התפלגות מחירי הדירות")
-
-        hist_data = pd.DataFrame({
-            "מחיר": df["מחיר הדירה"]
-        })
+        st.subheader("Price Distribution")
 
         st.bar_chart(
-            hist_data["מחיר"].value_counts(
+            df["מחיר הדירה"].value_counts(
                 bins=20
             )
         )
 
-        st.subheader("מרפסות")
+        st.subheader("Balcony Distribution")
 
         balcony_counts = (
             df["מרפסת"]
             .value_counts()
         )
 
-        st.bar_chart(balcony_counts)
+        st.bar_chart(
+            balcony_counts
+        )
 
 # ==================================================
-# חיזוי
+# PREDICTION
 # ==================================================
 
-elif page == "חיזוי מחיר":
+elif page == "Price Prediction":
 
-    st.title("🤖 חיזוי מחיר דירה")
+    st.title("🤖 Apartment Price Prediction")
 
     st.write(
-        "הזן נתוני דירה והמודל יחזה את המחיר."
+        "Enter apartment details and receive a real-time AI prediction."
     )
 
     col1, col2 = st.columns(2)
@@ -388,28 +435,28 @@ elif page == "חיזוי מחיר":
     with col1:
 
         size = st.slider(
-            "שטח הדירה",
+            "Apartment Size",
             45,
             200,
             90
         )
 
         distance = st.slider(
-            "מרחק מהים",
+            "Distance From Sea",
             100,
             5000,
             1500
         )
 
         year = st.slider(
-            "שנת בנייה",
+            "Year Built",
             1960,
             2025,
             2005
         )
 
         rooms = st.slider(
-            "מספר חדרים",
+            "Rooms",
             2,
             7,
             4
@@ -418,19 +465,19 @@ elif page == "חיזוי מחיר":
     with col2:
 
         apartments = st.slider(
-            "מספר דירות בבניין",
+            "Apartments In Building",
             4,
             100,
             20
         )
 
         balcony = st.selectbox(
-            "מרפסת",
+            "Balcony",
             ["כן", "לא"]
         )
 
         neighborhood = st.selectbox(
-            "שכונה",
+            "Neighborhood",
             sorted(df["שכונה"].unique())
         )
 
@@ -444,103 +491,105 @@ elif page == "חיזוי מחיר":
     }
 
     for col in X.columns:
+
         if col.startswith("שכונה_"):
+
             input_data[col] = 0
 
     neighborhood_col = f"שכונה_{neighborhood}"
 
     if neighborhood_col in input_data:
+
         input_data[neighborhood_col] = 1
 
     input_df = pd.DataFrame([input_data])
 
-    if st.button("חזוי מחיר"):
+    if st.button("Predict Price"):
 
         prediction = int(
             model.predict(input_df)[0]
         )
 
         st.success(
-            f"💰 מחיר הדירה המשוער: {prediction:,} ₪"
+            f"💰 Estimated Price: {prediction:,} ₪"
         )
 
         if prediction > 6500000:
 
             st.info(
-                "זו דירה יוקרתית במיוחד 🏆"
+                "Luxury Apartment 🏆"
             )
 
         elif prediction > 4000000:
 
             st.info(
-                "זו דירה ברמת מחיר גבוהה."
+                "High-End Apartment"
             )
 
         else:
 
             st.info(
-                "זו דירה ברמת מחיר ממוצעת."
+                "Mid-Range Apartment"
             )
 
 # ==================================================
-# איך המודל עובד
+# HOW IT WORKS
 # ==================================================
 
-elif page == "איך המודל עובד?":
+elif page == "How The Model Works":
 
-    st.title("🧠 איך המודל עובד?")
+    st.title("🧠 How The AI Model Works")
 
     st.markdown("""
-    ## שלב 1 — איסוף דאטה
+    ## Step 1 — Data Collection
 
-    יצרנו דאטה של 300 דירות בתל אביב.
-
-    לכל דירה יש:
-    - שטח
-    - מרחק מהים
-    - מספר חדרים
-    - שכונה
-    - שנת בנייה
-    - מרפסת
+    The system analyzes apartment attributes such as:
+    - Apartment size
+    - Distance from the sea
+    - Number of rooms
+    - Neighborhood
+    - Building age
+    - Balcony availability
 
     ---
 
-    ## שלב 2 — אימון מודל
+    ## Step 2 — Machine Learning
 
-    המודל לומד קשרים בין מאפייני הדירה למחיר שלה.
+    The AI model learns relationships between
+    apartment features and market prices.
 
-    השתמשנו במודל:
-    ### Random Forest
+    The model used:
+    ### Random Forest Regressor
 
-    זהו מודל מבוסס עצי החלטה.
-
-    ---
-
-    ## שלב 3 — חיזוי
-
-    המשתמש מזין נתונים חדשים,
-    והמודל חוזה מחיר משוער.
+    This algorithm combines multiple decision trees
+    to improve prediction accuracy.
 
     ---
 
-    ## מדדי הצלחה
+    ## Step 3 — Prediction
 
-    ### MAE
-    שגיאה ממוצעת:
+    Users enter apartment details,
+    and the model generates an estimated market value.
     """)
 
-    st.metric(
+    st.divider()
+
+    st.subheader("Model Metrics")
+
+    col1, col2 = st.columns(2)
+
+    col1.metric(
         "MAE",
         f"{int(mae):,} ₪"
     )
 
-    st.metric(
+    col2.metric(
         "R² Score",
         f"{r2:.2f}"
     )
 
     st.success(
-        "ככל ש-R² קרוב יותר ל-1, המודל טוב יותר."
+        "Higher R² values indicate better prediction quality."
     )
 
 # ==================================================
@@ -550,5 +599,5 @@ elif page == "איך המודל עובד?":
 st.divider()
 
 st.caption(
-    "נבנה באמצעות Streamlit + Scikit-learn | הדאטה סינתטי לצורכי לימוד"
+    "Powered by Streamlit & Machine Learning"
 )
